@@ -8,15 +8,16 @@ class Node;
  */
 template <typename T>
 class Edge {
-   private:
+private:
     Node<T>* m_destination;
     double m_weight;
     Edge<T>* m_next;
 
-   public:
+public:
     Edge(Node<T>* destination) : m_destination(destination), m_weight(0.0), m_next(nullptr) {}
 
-    Edge(Node<T>* destination, double weight) : m_destination(destination), m_weight(weight), m_next(nullptr) {}
+    Edge(Node<T>* destination, double weight)
+        : m_destination(destination), m_weight(weight), m_next(nullptr) {}
 
     Node<T>* get_destination() const { return m_destination; }
 
