@@ -2,6 +2,7 @@
 
 #include <climits>
 #include <iostream>
+#include <new>
 
 #include "edge.hpp"
 #include "node.hpp"
@@ -24,6 +25,10 @@ private:
 
 public:
     GraphList() : m_vertices(nullptr), m_vertex_count(0), m_capacity(0) {}
+
+    GraphList(const GraphList&) = delete;
+
+    GraphList& operator=(const GraphList&) = delete;
 
     ~GraphList();
 
@@ -65,7 +70,13 @@ bool GraphList<T>::grow() {
         return false;
     }
     int new_capacity = (m_capacity == 0) ? 1 : m_capacity * 2;
-    Node<T>** new_vertices = new Node<T>*[new_capacity];
+    Node<T>** new_vertices = nullptr;
+    try {
+        new_vertices = new Node<T>*[new_capacity];
+    } catch (const std::bad_alloc&) {
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return false;
+    }
     for (int i = 0; i < m_vertex_count; i++) {
         new_vertices[i] = m_vertices[i];
     }
@@ -84,7 +95,12 @@ int GraphList<T>::add_vertex(T data) {
     if (m_vertex_count == m_capacity && !grow()) {
         return -1;
     }
-    m_vertices[m_vertex_count] = new Node<T>(data);
+    try {
+        m_vertices[m_vertex_count] = new Node<T>(data);
+    } catch (const std::bad_alloc&) {
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return -1;
+    }
     return m_vertex_count++;
 }
 
@@ -136,7 +152,7 @@ bool GraphList<T>::add_edge(T from, T to, double weight) {
         std::cerr << "Error: no se permiten aristas a si mismo" << std::endl;
         return false;
     }
-    if (weight <= 0.0) {
+    if (!(weight > 0.0)) {
         std::cerr << "Error: el peso debe ser positivo" << std::endl;
         return false;
     }
@@ -144,10 +160,18 @@ bool GraphList<T>::add_edge(T from, T to, double weight) {
         std::cerr << "Error: la arista ya existe" << std::endl;
         return false;
     }
-    Edge<T>* forward = new Edge<T>(m_vertices[to_index], weight);
+    Edge<T>* forward = nullptr;
+    Edge<T>* backward = nullptr;
+    try {
+        forward = new Edge<T>(m_vertices[to_index], weight);
+        backward = new Edge<T>(m_vertices[from_index], weight);
+    } catch (const std::bad_alloc&) {
+        delete forward;
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return false;
+    }
     forward->set_next_edge(m_vertices[from_index]->get_edges());
     m_vertices[from_index]->set_edges(forward);
-    Edge<T>* backward = new Edge<T>(m_vertices[from_index], weight);
     backward->set_next_edge(m_vertices[to_index]->get_edges());
     m_vertices[to_index]->set_edges(backward);
     return true;
