@@ -1,0 +1,32 @@
+# Executables
+bin/casa_nostra
+bin/*.exe
+bin/*.out
+bin/*.bin
+bin/*.ex
+
+# Object files
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+
+# Precompiled headers
+*.gch
+*.pch
+
+# Editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+.clang-tidy

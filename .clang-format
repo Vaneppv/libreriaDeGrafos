@@ -1,0 +1,119 @@
+# Inherits the base style guidelines from Google's C++ style guide.
+BasedOnStyle: Google
+
+# Sets the number of spaces used for each level of indentation to 4.
+IndentWidth: 4
+
+# Enforces the use of spaces instead of tab characters for indentation.
+UseTab: Never
+
+# Sets the maximum allowed line length to 100 characters before wrapping.
+ColumnLimit: 100
+
+# Outdents access modifiers (public, private, protected) by 4 spaces.
+AccessModifierOffset: -4
+
+# Aligns parameters horizontally after an open bracket/parenthesis.
+AlignAfterOpenBracket: Align
+
+# Allows placing short, inline-defined functions on a single line.
+AllowShortFunctionsOnASingleLine: Inline
+
+# Keeps the return type on the same line as the function definition name.
+AlwaysBreakAfterDefinitionReturnType: None
+
+# Keeps the return type on the same line as the function declaration name.
+AlwaysBreakAfterReturnType: None
+
+# Forces a line break before multiline string literals.
+AlwaysBreakBeforeMultilineStrings: true
+
+# Allows packing multiple function arguments onto a single line if they fit within the column limit.
+BinPackArguments: true
+
+# Allows packing multiple function parameters onto a single line if they fit within the column limit.
+BinPackParameters: true
+
+# Attaches opening braces to the surrounding context (e.g., at the end of the function signature).
+BreakBeforeBraces: Attach
+
+# Breaks constructor initialization lists placing the break before the colon.
+BreakConstructorInitializers: BeforeColon
+
+# Allows breaking long string literals across multiple lines to respect the column limit.
+BreakStringLiterals: true
+
+# Allows flexible packing of constructor initializers (doesn't force all on one line or strictly one per line).
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+
+# Disables auto-detecting pointer alignment from the file; strictly uses the 'PointerAlignment' setting.
+DerivePointerAlignment: false
+
+# Aligns the pointer asterisk/reference to the left (with the type, e.g., 'int* a').
+PointerAlignment: Left
+
+# Indents 'case' labels one level inward from their enclosing 'switch' statement.
+IndentCaseLabels: true
+
+# Keeps preprocessor directives (like #include, #define) at the leftmost column without indentation.
+IndentPPDirectives: None
+
+# Removes empty lines located immediately after an opening brace.
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+# Limits consecutive empty lines to a maximum of 1, removing redundant blank lines.
+MaxEmptyLinesToKeep: 1
+
+# Does not add extra indentation for code placed inside namespaces.
+NamespaceIndentation: None
+
+# Enables automatic reformatting of long comments to fit within the column limit.
+ReflowComments: true
+
+# Automatically sorts #include directives in alphabetical order.
+SortIncludes: true
+
+# Inserts a space after the 'template' keyword.
+SpaceAfterTemplateKeyword: true
+
+# Inserts a space before a C++11 braced initialization list.
+SpaceBeforeCpp11BracedList: true
+
+# Inserts a space before the colon in a constructor initialization list.
+SpaceBeforeCtorInitializerColon: true
+
+# Inserts a space before the colon in class inheritance declarations.
+SpaceBeforeInheritanceColon: true
+
+# Inserts a space before parentheses only for control statements (if, for, while, switch).
+SpaceBeforeParens: ControlStatements
+
+# Inserts a space before the colon in range-based 'for' loops.
+SpaceBeforeRangeBasedForLoopColon: true
+
+# Prevents inserting spaces inside empty parentheses '()'.
+SpaceInEmptyParentheses: false
+
+# Ensures exactly 1 space before a comment at the end of a line of code.
+SpacesBeforeTrailingComments: 1
+
+# Prevents inserting spaces inside template angle brackets '<>'.
+SpacesInAngles: false
+
+# Inserts spaces inside container literals.
+SpacesInContainerLiterals: true
+
+# Prevents inserting spaces inside the parentheses of a C-style cast.
+SpacesInCStyleCastParentheses: false
+
+# Prevents inserting spaces just inside opening and closing parentheses.
+SpacesInParentheses: false
+
+# Prevents inserting spaces just inside square brackets.
+SpacesInSquareBrackets: false
+
+# Formats the code according to C++20 standard syntax and features.
+Standard: c++20
+
+# Defines the visual width of a tab character as 4 spaces (used if tabs were allowed, or for alignment).
+TabWidth: 4
