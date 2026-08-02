@@ -1,9 +1,12 @@
 # Executables
-bin/casa_nostra
+bin/grafos
 bin/*.exe
 bin/*.out
 bin/*.bin
 bin/*.ex
+
+# Build artifacts
+build/
 
 # Object files
 *.o
