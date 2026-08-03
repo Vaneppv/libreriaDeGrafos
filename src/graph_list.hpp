@@ -54,6 +54,8 @@ public:
     bool dfs(T start, T target) const;
 
     double shortest_path(T from, T to, T* path) const;
+
+    int count_components() const;
 };
 
 template <typename T>
@@ -467,4 +469,51 @@ double GraphList<T>::shortest_path(T from, T to, T* path) const {
     delete[] predecessor;
     delete[] visited;
     return distance;
+}
+
+template <typename T>
+int GraphList<T>::count_components() const {
+    if (m_vertex_count == 0) {
+        return 0;
+    }
+    bool* visited = nullptr;
+    int* queue = nullptr;
+    try {
+        visited = new bool[m_vertex_count];
+        queue = new int[m_vertex_count];
+    } catch (const std::bad_alloc&) {
+        delete[] visited;
+        delete[] queue;
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return -1;
+    }
+    for (int i = 0; i < m_vertex_count; i++) {
+        visited[i] = false;
+    }
+    int components = 0;
+    for (int i = 0; i < m_vertex_count; i++) {
+        if (visited[i]) {
+            continue;
+        }
+        components++;
+        int front = 0;
+        int rear = 0;
+        visited[i] = true;
+        queue[rear++] = i;
+        while (front < rear) {
+            int current = queue[front++];
+            Edge<T>* edge = m_vertices[current]->get_edges();
+            while (edge != nullptr) {
+                int neighbor = find_vertex(edge->get_destination()->get_data());
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    queue[rear++] = neighbor;
+                }
+                edge = edge->get_next_edge();
+            }
+        }
+    }
+    delete[] visited;
+    delete[] queue;
+    return components;
 }
