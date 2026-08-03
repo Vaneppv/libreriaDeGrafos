@@ -47,6 +47,8 @@ public:
     bool remove_vertex(T data);
 
     double get_weight(int from, int to) const;
+
+    int bfs(T start, T target, T* path) const;
 };
 
 template <typename T>
@@ -251,4 +253,78 @@ double GraphList<T>::get_weight(int from, int to) const {
         return -1.0;
     }
     return edge->get_weight();
+}
+
+template <typename T>
+int GraphList<T>::bfs(T start, T target, T* path) const {
+    int start_index = find_vertex(start);
+    int target_index = find_vertex(target);
+    if (start_index == -1 || target_index == -1) {
+        std::cerr << "Error: vertice inexistente" << std::endl;
+        return -1;
+    }
+    if (start_index == target_index) {
+        path[0] = start;
+        return 0;
+    }
+    bool* visited = nullptr;
+    int* predecessor = nullptr;
+    int* queue = nullptr;
+    try {
+        visited = new bool[m_vertex_count];
+        predecessor = new int[m_vertex_count];
+        queue = new int[m_vertex_count];
+    } catch (const std::bad_alloc&) {
+        delete[] visited;
+        delete[] predecessor;
+        delete[] queue;
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return -1;
+    }
+    for (int i = 0; i < m_vertex_count; i++) {
+        visited[i] = false;
+        predecessor[i] = -1;
+    }
+    int front = 0;
+    int rear = 0;
+    visited[start_index] = true;
+    queue[rear++] = start_index;
+    bool found = false;
+    while (front < rear && !found) {
+        int current = queue[front++];
+        Edge<T>* edge = m_vertices[current]->get_edges();
+        while (edge != nullptr) {
+            int neighbor = find_vertex(edge->get_destination()->get_data());
+            if (!visited[neighbor]) {
+                visited[neighbor] = true;
+                predecessor[neighbor] = current;
+                queue[rear++] = neighbor;
+                if (neighbor == target_index) {
+                    found = true;
+                    break;
+                }
+            }
+            edge = edge->get_next_edge();
+        }
+    }
+    if (!found) {
+        delete[] visited;
+        delete[] predecessor;
+        delete[] queue;
+        return -1;
+    }
+    int count = 0;
+    int current = target_index;
+    while (current != -1) {
+        queue[count++] = current;
+        current = predecessor[current];
+    }
+    for (int i = 0; i < count; i++) {
+        path[i] = *get_vertex(queue[count - 1 - i]);
+    }
+    int distance = count - 1;
+    delete[] visited;
+    delete[] predecessor;
+    delete[] queue;
+    return distance;
 }
