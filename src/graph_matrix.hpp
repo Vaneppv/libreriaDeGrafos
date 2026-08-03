@@ -44,6 +44,10 @@ public:
     bool remove_vertex(T data);
 
     double get_weight(int from, int to) const;
+
+    int bfs(T start, T target, T* path) const;
+
+    bool dfs(T start, T target) const;
 };
 
 template <typename T>
@@ -231,4 +235,123 @@ double GraphMatrix<T>::get_weight(int from, int to) const {
         return NO_EDGE;
     }
     return m_matrix[from][to];
+}
+
+template <typename T>
+int GraphMatrix<T>::bfs(T start, T target, T* path) const {
+    int start_index = find_vertex(start);
+    int target_index = find_vertex(target);
+    if (start_index == -1 || target_index == -1) {
+        std::cerr << "Error: vertice inexistente" << std::endl;
+        return -1;
+    }
+    if (start_index == target_index) {
+        path[0] = start;
+        return 0;
+    }
+    bool* visited = nullptr;
+    int* predecessor = nullptr;
+    int* queue = nullptr;
+    try {
+        visited = new bool[m_vertex_count];
+        predecessor = new int[m_vertex_count];
+        queue = new int[m_vertex_count];
+    } catch (const std::bad_alloc&) {
+        delete[] visited;
+        delete[] predecessor;
+        delete[] queue;
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return -1;
+    }
+    for (int i = 0; i < m_vertex_count; i++) {
+        visited[i] = false;
+        predecessor[i] = -1;
+    }
+    int front = 0;
+    int rear = 0;
+    visited[start_index] = true;
+    queue[rear++] = start_index;
+    bool found = false;
+    while (front < rear && !found) {
+        int current = queue[front++];
+        for (int j = 0; j < m_vertex_count; j++) {
+            if (m_matrix[current][j] != NO_EDGE && !visited[j]) {
+                visited[j] = true;
+                predecessor[j] = current;
+                queue[rear++] = j;
+                if (j == target_index) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+    }
+    if (!found) {
+        delete[] visited;
+        delete[] predecessor;
+        delete[] queue;
+        return -1;
+    }
+    int count = 0;
+    int current = target_index;
+    while (current != -1) {
+        queue[count++] = current;
+        current = predecessor[current];
+    }
+    for (int i = 0; i < count; i++) {
+        path[i] = *get_vertex(queue[count - 1 - i]);
+    }
+    int distance = count - 1;
+    delete[] visited;
+    delete[] predecessor;
+    delete[] queue;
+    return distance;
+}
+
+template <typename T>
+bool GraphMatrix<T>::dfs(T start, T target) const {
+    int start_index = find_vertex(start);
+    int target_index = find_vertex(target);
+    if (start_index == -1 || target_index == -1) {
+        std::cerr << "Error: vertice inexistente" << std::endl;
+        return false;
+    }
+    bool* visited = nullptr;
+    int* stack = nullptr;
+    try {
+        visited = new bool[m_vertex_count];
+        stack = new int[m_vertex_count];
+    } catch (const std::bad_alloc&) {
+        delete[] visited;
+        delete[] stack;
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return false;
+    }
+    for (int i = 0; i < m_vertex_count; i++) {
+        visited[i] = false;
+    }
+    int top = 0;
+    stack[top++] = start_index;
+    visited[start_index] = true;
+    bool found = false;
+    while (top > 0) {
+        int current = stack[--top];
+        std::cout << *get_vertex(current) << '\n';
+        if (current == target_index) {
+            found = true;
+            break;
+        }
+        for (int j = m_vertex_count - 1; j >= 0; j--) {
+            if (m_matrix[current][j] != NO_EDGE && !visited[j]) {
+                visited[j] = true;
+                stack[top++] = j;
+            }
+        }
+    }
+    delete[] visited;
+    delete[] stack;
+    if (!found) {
+        std::cout << "Objetivo no encontrado" << '\n';
+    }
+    return found;
 }
