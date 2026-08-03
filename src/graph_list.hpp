@@ -49,6 +49,8 @@ public:
     double get_weight(int from, int to) const;
 
     int bfs(T start, T target, T* path) const;
+
+    bool dfs(T start, T target) const;
 };
 
 template <typename T>
@@ -327,4 +329,55 @@ int GraphList<T>::bfs(T start, T target, T* path) const {
     delete[] predecessor;
     delete[] queue;
     return distance;
+}
+
+template <typename T>
+bool GraphList<T>::dfs(T start, T target) const {
+    int start_index = find_vertex(start);
+    int target_index = find_vertex(target);
+    if (start_index == -1 || target_index == -1) {
+        std::cerr << "Error: vertice inexistente" << std::endl;
+        return false;
+    }
+    bool* visited = nullptr;
+    int* stack = nullptr;
+    try {
+        visited = new bool[m_vertex_count];
+        stack = new int[m_vertex_count];
+    } catch (const std::bad_alloc&) {
+        delete[] visited;
+        delete[] stack;
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return false;
+    }
+    for (int i = 0; i < m_vertex_count; i++) {
+        visited[i] = false;
+    }
+    int top = 0;
+    stack[top++] = start_index;
+    visited[start_index] = true;
+    bool found = false;
+    while (top > 0) {
+        int current = stack[--top];
+        std::cout << *get_vertex(current) << '\n';
+        if (current == target_index) {
+            found = true;
+            break;
+        }
+        Edge<T>* edge = m_vertices[current]->get_edges();
+        while (edge != nullptr) {
+            int neighbor = find_vertex(edge->get_destination()->get_data());
+            if (!visited[neighbor]) {
+                visited[neighbor] = true;
+                stack[top++] = neighbor;
+            }
+            edge = edge->get_next_edge();
+        }
+    }
+    delete[] visited;
+    delete[] stack;
+    if (!found) {
+        std::cout << "Objetivo no encontrado" << '\n';
+    }
+    return found;
 }
