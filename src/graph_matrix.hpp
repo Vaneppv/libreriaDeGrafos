@@ -1,5 +1,6 @@
 #pragma once
 
+#include <climits>
 #include <iostream>
 #include <new>
 
@@ -21,6 +22,10 @@ private:
 
 public:
     GraphMatrix() : m_matrix(nullptr), m_data(nullptr), m_vertex_count(0), m_capacity(0) {}
+
+    GraphMatrix(const GraphMatrix&) = delete;
+
+    GraphMatrix& operator=(const GraphMatrix&) = delete;
 
     ~GraphMatrix();
 
@@ -52,6 +57,10 @@ GraphMatrix<T>::~GraphMatrix() {
 
 template <typename T>
 bool GraphMatrix<T>::grow() {
+    if (m_capacity > INT_MAX / 2) {
+        std::cerr << "Error: overflow al agrandar el grafo" << std::endl;
+        return false;
+    }
     int new_capacity = (m_capacity == 0) ? 1 : m_capacity * 2;
     double** new_matrix = nullptr;
     T* new_data = nullptr;
@@ -121,6 +130,10 @@ int GraphMatrix<T>::find_vertex(T data) const {
 
 template <typename T>
 T* GraphMatrix<T>::get_vertex(int index) const {
+    if (index < 0 || index >= m_vertex_count) {
+        std::cerr << "Error: indice fuera de rango" << std::endl;
+        return nullptr;
+    }
     return &m_data[index];
 }
 
@@ -179,6 +192,16 @@ bool GraphMatrix<T>::remove_vertex(T data) {
         return false;
     }
     int n = m_vertex_count;
+    double* fresh_row = nullptr;
+    try {
+        fresh_row = new double[m_capacity];
+    } catch (const std::bad_alloc&) {
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return false;
+    }
+    for (int j = 0; j < m_capacity; j++) {
+        fresh_row[j] = NO_EDGE;
+    }
     double* removed_row = m_matrix[index];
     for (int i = 0; i < n; i++) {
         if (i == index) {
@@ -192,7 +215,7 @@ bool GraphMatrix<T>::remove_vertex(T data) {
     for (int i = index; i < n - 1; i++) {
         m_matrix[i] = m_matrix[i + 1];
     }
-    m_matrix[n - 1] = nullptr;
+    m_matrix[n - 1] = fresh_row;
     delete[] removed_row;
     for (int i = index; i < n - 1; i++) {
         m_data[i] = m_data[i + 1];
@@ -203,5 +226,9 @@ bool GraphMatrix<T>::remove_vertex(T data) {
 
 template <typename T>
 double GraphMatrix<T>::get_weight(int from, int to) const {
+    if (from < 0 || from >= m_vertex_count || to < 0 || to >= m_vertex_count) {
+        std::cerr << "Error: indice fuera de rango" << std::endl;
+        return NO_EDGE;
+    }
     return m_matrix[from][to];
 }
