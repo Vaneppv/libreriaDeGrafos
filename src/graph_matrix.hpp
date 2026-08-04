@@ -2,6 +2,7 @@
 
 #include <climits>
 #include <iostream>
+#include <limits>
 #include <new>
 
 /**
@@ -48,6 +49,12 @@ public:
     int bfs(T start, T target, T* path) const;
 
     bool dfs(T start, T target) const;
+
+    double shortest_path(T from, T to, T* path) const;
+
+    void all_pairs_shortest_path(double* dist, int* next) const;
+
+    int count_components() const;
 };
 
 template <typename T>
@@ -354,4 +361,85 @@ bool GraphMatrix<T>::dfs(T start, T target) const {
         std::cout << "Objetivo no encontrado" << '\n';
     }
     return found;
+}
+
+template <typename T>
+double GraphMatrix<T>::shortest_path(T from, T to, T* path) const {
+    int from_index = find_vertex(from);
+    int to_index = find_vertex(to);
+    if (from_index == -1 || to_index == -1) {
+        std::cerr << "Error: vertice inexistente" << std::endl;
+        return -1.0;
+    }
+    if (from_index == to_index) {
+        path[0] = from;
+        return 0.0;
+    }
+    const double INF = std::numeric_limits<double>::max();
+    double* dist = nullptr;
+    int* predecessor = nullptr;
+    bool* visited = nullptr;
+    try {
+        dist = new double[m_vertex_count];
+        predecessor = new int[m_vertex_count];
+        visited = new bool[m_vertex_count];
+    } catch (const std::bad_alloc&) {
+        delete[] dist;
+        delete[] predecessor;
+        delete[] visited;
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return -1.0;
+    }
+    for (int i = 0; i < m_vertex_count; i++) {
+        dist[i] = INF;
+        predecessor[i] = -1;
+        visited[i] = false;
+    }
+    dist[from_index] = 0.0;
+    for (int step = 0; step < m_vertex_count; step++) {
+        int current = -1;
+        double best = INF;
+        for (int i = 0; i < m_vertex_count; i++) {
+            if (!visited[i] && dist[i] < best) {
+                best = dist[i];
+                current = i;
+            }
+        }
+        if (current == -1) {
+            break;
+        }
+        visited[current] = true;
+        if (current == to_index) {
+            break;
+        }
+        for (int j = 0; j < m_vertex_count; j++) {
+            if (m_matrix[current][j] != NO_EDGE && !visited[j] &&
+                dist[current] < INF && dist[current] + m_matrix[current][j] < dist[j]) {
+                dist[j] = dist[current] + m_matrix[current][j];
+                predecessor[j] = current;
+            }
+        }
+    }
+    if (dist[to_index] == INF) {
+        delete[] dist;
+        delete[] predecessor;
+        delete[] visited;
+        return -1.0;
+    }
+    int count = 0;
+    int current = to_index;
+    while (current != -1) {
+        count++;
+        current = predecessor[current];
+    }
+    current = to_index;
+    for (int i = count - 1; i >= 0; i--) {
+        path[i] = *get_vertex(current);
+        current = predecessor[current];
+    }
+    double distance = dist[to_index];
+    delete[] dist;
+    delete[] predecessor;
+    delete[] visited;
+    return distance;
 }
