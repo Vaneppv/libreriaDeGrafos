@@ -482,3 +482,47 @@ void GraphMatrix<T>::all_pairs_shortest_path(double* dist, int* next) const {
         }
     }
 }
+
+template <typename T>
+int GraphMatrix<T>::count_components() const {
+    if (m_vertex_count == 0) {
+        return 0;
+    }
+    bool* visited = nullptr;
+    int* queue = nullptr;
+    try {
+        visited = new bool[m_vertex_count];
+        queue = new int[m_vertex_count];
+    } catch (const std::bad_alloc&) {
+        delete[] visited;
+        delete[] queue;
+        std::cerr << "Error: memoria insuficiente" << std::endl;
+        return -1;
+    }
+    for (int i = 0; i < m_vertex_count; i++) {
+        visited[i] = false;
+    }
+    int components = 0;
+    for (int i = 0; i < m_vertex_count; i++) {
+        if (visited[i]) {
+            continue;
+        }
+        components++;
+        int front = 0;
+        int rear = 0;
+        visited[i] = true;
+        queue[rear++] = i;
+        while (front < rear) {
+            int current = queue[front++];
+            for (int j = 0; j < m_vertex_count; j++) {
+                if (m_matrix[current][j] != NO_EDGE && !visited[j]) {
+                    visited[j] = true;
+                    queue[rear++] = j;
+                }
+            }
+        }
+    }
+    delete[] visited;
+    delete[] queue;
+    return components;
+}
