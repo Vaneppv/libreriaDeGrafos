@@ -443,3 +443,42 @@ double GraphMatrix<T>::shortest_path(T from, T to, T* path) const {
     delete[] visited;
     return distance;
 }
+
+template <typename T>
+void GraphMatrix<T>::all_pairs_shortest_path(double* dist, int* next) const {
+    const double INF = std::numeric_limits<double>::max();
+    for (int i = 0; i < m_vertex_count; i++) {
+        for (int j = 0; j < m_vertex_count; j++) {
+            int index = (i * m_vertex_count) + j;
+            if (i == j) {
+                dist[index] = 0.0;
+                next[index] = j;
+            } else if (m_matrix[i][j] != NO_EDGE) {
+                dist[index] = m_matrix[i][j];
+                next[index] = j;
+            } else {
+                dist[index] = INF;
+                next[index] = -1;
+            }
+        }
+    }
+    for (int k = 0; k < m_vertex_count; k++) {
+        for (int i = 0; i < m_vertex_count; i++) {
+            if (dist[(i * m_vertex_count) + k] == INF) {
+                continue;
+            }
+            for (int j = 0; j < m_vertex_count; j++) {
+                int index = (i * m_vertex_count) + j;
+                int through = (i * m_vertex_count) + k;
+                int from_k = (k * m_vertex_count) + j;
+                if (dist[from_k] == INF) {
+                    continue;
+                }
+                if (dist[through] + dist[from_k] < dist[index]) {
+                    dist[index] = dist[through] + dist[from_k];
+                    next[index] = next[through];
+                }
+            }
+        }
+    }
+}
