@@ -1,8 +1,9 @@
 # Librería de Grafos
 
 Librería header-only en C++20 para trabajar con grafos no dirigidos y con peso,
-implementada con lista de adyacencia. Es "incluir y usar": basta con copiar el
-header y `#include` desde cualquier proyecto.
+implementada con lista de adyacencia (`GraphList`) y con matriz de adyacencia
+(`GraphMatrix`). Es "incluir y usar": basta con copiar el header y `#include`
+desde cualquier proyecto.
 
 ## Estructura de carpetas
 
@@ -42,7 +43,9 @@ double distancia = graph.get_weight(madrid, 1);
 ```
 
 El grafo es no dirigido y con pesos positivos. La clase es plantilla: el dato
-del vértice puede ser cualquier tipo con `operator==`.
+del vértice puede ser cualquier tipo con `operator==`. Las dos implementaciones
+(`GraphList` y `GraphMatrix`) comparten la misma API, por lo que son
+intercambiables sin cambiar el código que las usa.
 
 ## API actual
 
@@ -58,16 +61,29 @@ del vértice puede ser cualquier tipo con `operator==`.
 | `bool remove_edge(T, T)`      | Elimina la arista                                      |
 | `bool remove_vertex(T)`       | Elimina el vértice y sus aristas (reindexa)            |
 | `double get_weight(int, int)` | Peso de la arista o `-1` si no existe                  |
+| `int bfs(T, T, T*)`           | Ruta y distancia (aristas) entre dos vértices (`-1` si no hay) |
+| `bool dfs(T, T)`              | Recorrido en profundidad; `false` si no encuentra el objetivo |
+| `double shortest_path(T, T, T*)` | Camino más corto (Dijkstra) con peso total (`< 0` si no hay) |
+| `int count_components()`      | Número de componentes conexas                          |
+
+### GraphMatrix<T>
+
+`GraphMatrix` ofrece la misma API que `GraphList` y además:
+
+| Método                                     | Descripción                        |
+| ------------------------------------------ | ---------------------------------- |
+| `void all_pairs_shortest_path(double*, int*)` | Distancias entre todos los pares (Floyd-Warshall) |
 
 Los fallos (índice fuera de rango, vértice inexistente, memoria insuficiente)
 se reportan por `stderr` y con valor de retorno de error.
 
 ## Estado del proyecto
 
-Implementado: `GraphList` con gestión de vértices y aristas, verificación de
-límites y seguridad de memoria. En desarrollo: recorridos BFS/DFS, camino más
-corto (Dijkstra), componentes conexas, implementación con matriz de adyacencia
-y menú interactivo.
+Implementado y probado en ambas implementaciones (`GraphList` y `GraphMatrix`):
+gestión de vértices y aristas, verificación de límites y seguridad de memoria,
+recorridos BFS y DFS, camino más corto (Dijkstra), distancias entre todos los
+pares (Floyd-Warshall, en `GraphMatrix`), componentes conexas, lector de CSV y
+menú interactivo persistente.
 
 ## Referencias
 
